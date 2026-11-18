@@ -1,0 +1,22 @@
+%pip install -q ucimlrepo
+import pandas as pd
+from ucimlrepo import fetch_ucirepo
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+
+concrete = fetch_ucirepo(id=165)
+
+X = concrete.data.features
+y = concrete.data.targets.iloc[:, 0]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.20, random_state=42
+)
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+print("Intercept:", model.intercept_)
+print(pd.Series(model.coef_, index=X_train.columns))
+print(X.head(1))
+print(y.head(1))
