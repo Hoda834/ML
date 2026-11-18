@@ -1,0 +1,43 @@
+import numpy as np
+import pandas as pd
+rng=np.random.default_rng(5)
+distance_km=rng.integers(1,21,60)
+item_count=rng.integers(1,13,60)
+orders_in_queue=rng.integers(0,16,60)
+available_couriers=rng.integers(1,9,60)
+is_peak_hour=rng.integers(0,2,60)
+noise=rng.normal(0,3,60)
+delivery_minutes = (
+    25
+    + 2 * distance_km
+    + 0.8 * item_count
+    + 1.5 * orders_in_queue
+    - 2 * available_couriers
+    + 6 * is_peak_hour
+    + noise
+)
+df=pd.DataFrame({"available_couriers":available_couriers,"distance_km":distance_km,"item_count":item_count,"orders_in_queue":orders_in_queue,"is_peak_hour":is_peak_hour,"delivery_minutes":delivery_minutes})
+x=df[["available_couriers","distance_km","item_count","orders_in_queue","is_peak_hour"]]
+y=df["delivery_minutes"]
+x_train=x.iloc[:45]
+y_train=y.iloc[:45]
+x_test=x.iloc[45:]
+y_test=y.iloc[45:]
+from sklearn.linear_model import LinearRegression
+model=LinearRegression()
+model.fit(x_train,y_train)
+print("Intercept:", model.intercept_)
+print(pd.Series(model.coef_, index=x_train.columns))
+y_pred=model.predict(x_test)
+results=pd.DataFrame({"Actual":y_test.to_numpy(),"predicted":y_pred})
+results["Residual"]=results["Actual"]-results["predicted"]
+print(results.head())
+from sklearn.metrics import mean_absolute_error,mean_squared_error,r2_score
+mae=mean_absolute_error(y_test,y_pred)
+mse=mean_squared_error(y_test,y_pred)
+rmse=np.sqrt(mse)
+r2=r2_score(y_test,y_pred)
+print("mae:", round(mae, 2))
+print("mse:", round(mse, 2))
+print("rmse:", round(rmse, 2))
+print("r2:", round(r2, 4))
