@@ -1,0 +1,32 @@
+import numpy as np
+import pandas as pd
+rng=np.random.default_rng(5)
+page_count=rng.integers(10,200,40)
+copy_count=rng.integers(1,30,40)
+noise=rng.normal(0,2,40)
+cost=12 + 0.20 * page_count + 1.50 * copy_count + noise
+df=pd.DataFrame({"copy_count":copy_count,"page_count":page_count,"cost":cost})
+x=df[["copy_count","page_count"]]
+y=df["cost"]
+x_train=x.iloc[:30]
+y_train=y.iloc[:30]
+x_test=x.iloc[30:]
+y_test=y.iloc[30:]
+from sklearn.linear_model import LinearRegression
+model=LinearRegression()
+model.fit(x_train,y_train)
+intercept=model.intercept_
+coefficient=model.coef_
+y_pred=model.predict(x_test)
+results=pd.DataFrame({"Actual":y_test.to_numpy(),"predicted":y_pred})
+results["Residual"]=results["Actual"]-results["predicted"]
+print(results.head())
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+mae=mean_absolute_percentage_error(y_test,y_pred)
+mse=mean_squared_error(y_test,y_pred)
+rmse=np.sqrt(mse)
+r2=r2_score(y_test,y_pred)
+print(mae,mse,rmse,r2)
+print(intercept)
+print("copy_count:", coefficient[0])
+print("page_count:", coefficient[1])
