@@ -1,0 +1,24 @@
+import pandas as pd
+import numpy as np
+rng=np.random.default_rng(20)
+months=pd.date_range(start="2024-01-01", periods=48, freq="ME")
+avg_temperature=rng.integers(3,40,48)
+occupancy=rng.integers(1,8,48)
+noise=rng.normal(0,15,48)
+electricity_kwh=(300+2.5*occupancy+10*avg_temperature+noise)
+df=pd.DataFrame({"month":months,"avg_temperature":avg_temperature, "occupancy":occupancy,"electricity_kwh": electricity_kwh})
+x=df[["avg_temperature","occupancy"]]
+y=df["electricity_kwh"]
+x_train=x.iloc[:36]
+y_train=y.iloc[:36]
+x_test=x.iloc[36:]
+y_test=y.iloc[36:]
+from sklearn.linear_model import LinearRegression
+model=LinearRegression()
+model.fit(x_train, y_train)
+coefficient=model.coef_
+intercept=model.intercept_
+print(coefficient)
+print(intercept)
+x_test=model.predict(x_train)
+
