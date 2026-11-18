@@ -1,0 +1,73 @@
+import pandas as pd
+import numpy as np
+rng=np.random.default_rng(42)
+months=pd.date_range( start="2025-01-01", periods=24, freq="ME")
+marketing=rng.integers(1000,6000,24)
+customers=rng.integers(100,500,24)
+noise=rng.normal(0,1500,24)
+sales=(5000+2.58marketing+40*customers+noise)
+df=pd.DataFrame({"month":months,"marketing_spend":marketing,"active_customer":customers,"sales":sales.round(2)})
+print(df.head())
+X=df[["marketing_spend","active_customer"]]
+Y=df["sales"]
+x_train=X.iloc[:18]
+x_test=X.iloc[18:]
+y_train=Y.iloc[:18]
+y_test=Y.iloc[18:]
+from sklearn.linear_model import LinearRegression
+model=LinearRegression()
+model.fit(x_train, y_train)
+print("intercept:", model.intercept_)
+print("coefficients:", model.coef_)
+y_pred = model.predict(x_test)
+results = pd.DataFrame({
+    "Actual": y_test.to_numpy(),
+    "Predicted": y_pred
+results["Residual"] = results["Actual"] - results["Predicted"]
+
+print(results.round(2))
+from sklearn.metrics import mean_absolute_error
+
+mae = mean_absolute_error(y_test, y_pred)
+
+print("MAE:", round(mae, 2))
+from sklearn.metrics import mean_squared_error
+import numpy as np
+
+mse = mean_squared_error(y_test, y_pred)
+
+rmse = np.sqrt(mse)
+
+print("MSE:", round(mse, 2))
+print("RMSE:", round(rmse, 2))
+from sklearn.metrics import r2_score
+
+r2 = r2_score(y_test, y_pred)
+
+print("R2:", round(r2, 4))
+y = df["sales"]
+
+print(y.head())
+baseline_pred = y.shift(1).iloc[18:]
+
+print(baseline_pred)
+from sklearn.metrics import mean_absolute_error
+
+baseline_mae = mean_absolute_error(
+    y_test,
+    baseline_pred
+)
+
+print("Baseline MAE:", round(baseline_mae, 2))
+import matplotlib.pyplot as plt
+
+plt.scatter(y_pred, results["Residual"])
+
+plt.axhline(y=0, color="red", linestyle="--")
+
+plt.xlabel("Predicted Sales")
+plt.ylabel("Residual")
+plt.title("Residual Plot")
+
+plt.show()
+
