@@ -1,0 +1,16 @@
+%pip install -q ucimlrepo
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from ucimlrepo import fetch_ucirepo
+cars=fetch_ucirepo(id=9)
+x=cars.data.features[["weight"]]
+y=cars.data.targets["mpg"]
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.20,random_state=42)
+model=LinearRegression()
+model.fit(x_train,y_train)
+print("intercept:",model.intercept_)
+print("weight coefficient:",model.coef_[0])
+##fetch_ucirepo(id=9) دیتاست خودروها را می‌گیرد. این همان تابعی است که برای بتن استفاده کردی، با شناسه‌ای دیگر.
+features[["weight"]] یک جدول تک‌ستونه برای ورودی مدل می‌سازد. targets["mpg"] ستون جواب‌های ثبت‌شده را برمی‌دارد.
+fit() از جفت‌های وزن و MPG ثبت‌شده یک مقدار ثابت و یک ضریب یاد می‌گیرد. چون فقط یک ورودی داریم، model.coef_[0] همان ضریب وزن است.
